@@ -34,8 +34,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: MOTD.zip
-          asset_name: MOTD.zip
+          asset_path: wcas-plugin.zip
+          asset_name: wcas-plugin.zip
           asset_content_type: application/zip
 
       - name: Get Release Asset Download URL
