@@ -26,7 +26,7 @@ jobs:
 
       - name: Create Release Zip
         run: |
-          zip -r MOTD.zip . -x ".github/*" ".vscode/*" ".git/*"
+          zip -r wcas-plugin.zip . -x ".github/*" ".vscode/*" ".git/*"
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
