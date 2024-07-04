@@ -1,0 +1,31 @@
+{
+    "name": "bretterer/wcas-plugin",
+    "description": "WordPress Plugin for Warren County Astronomical Society",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Bretterer\\WcasPlugin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Brian Retterer",
+            "email": "brian@brianretterer.com"
+        }
+    ],
+    "require-dev": {
+        "pestphp/pest": "^2.34",
+        "brain/monkey": "^2.6"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

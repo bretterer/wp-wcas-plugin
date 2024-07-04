@@ -1,0 +1,70 @@
+name: Release Zip and Update Info
+
+on:
+  release:
+    types: [published]
+
+permissions:
+      contents: write
+
+jobs:
+  create_zip_and_update_info:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP with Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+
+      - name: Install Dependencies (without dev)
+        run: composer install --no-dev
+
+      - name: Create Release Zip
+        run: |
+          zip -r MOTD.zip . -x ".github/*" ".vscode/*" ".git/*"
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: MOTD.zip
+          asset_name: MOTD.zip
+          asset_content_type: application/zip
+
+      - name: Get Release Asset Download URL
+        id: get_download_url
+        run: |
+          download_url=$(curl -sH "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "${{ github.event.release.assets_url }}" | jq -r '.[0].browser_download_url')
+          echo "download_url=$download_url" >> $GITHUB_OUTPUT
+
+
+      - name: Update Info.json
+        run: |
+          now=$(date --utc +"%Y-%m-%d %H:%M:%S") # Get current UTC date and time in the desired format
+          jq --arg version "${{ github.event.release.tag_name }}" \
+              --arg download_url "${{ steps.get_download_url.outputs.download_url }}" \
+              --arg last_updated "$now" '
+            .version = $version |
+            .download_url = $download_url |
+            .last_updated = $last_updated
+          ' info.json > info.json.tmp
+          mv info.json.tmp info.json
+
+
+      - name: Prepare gh-pages
+        run: |
+          mkdir gh-pages
+          cp info.json gh-pages/
+
+      - name: Deploy to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4.4.0
+        with:
+          branch: gh-pages
+          folder: gh-pages/
